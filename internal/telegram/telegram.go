@@ -111,6 +111,36 @@ func (t *Telegram) PollUpdates(ctx context.Context) {
 	}
 }
 
+func (t *Telegram) SendMessage(ctx context.Context, chatID int64, text string) error {
+	baseURL, err := url.Parse(t.tgApiUrlWithToken + sendMessageMethod)
+	if err != nil {
+		return fmt.Errorf("failed to parse send message url: %w", err)
+	}
+
+	params := url.Values{}
+	params.Add("chat_id", fmt.Sprintf("%d", chatID))
+	params.Add("text", text)
+	baseURL.RawQuery = params.Encode()
+
+	req, err := http.NewRequestWithContext(ctx, "POST", baseURL.String(), nil)
+	if err != nil {
+		return fmt.Errorf("failed to create send message POST request: %w", err)
+	}
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to send message: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to send message, status code: %d, response: %s", resp.StatusCode, string(body))
+	}
+
+	return nil
+}
+
 func (t *Telegram) GetUpdate() <-chan Update {
 	return t.updates
 }

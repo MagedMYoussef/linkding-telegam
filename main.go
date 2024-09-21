@@ -11,6 +11,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const (
+	MsgLinkAdded = "✅ Link successfully added! 🎉"
+
+	ErrInvalidURL = "❌ That doesn't look like a valid URL. Double-check and try again! 🔍"
+)
+
 var log = logrus.New()
 
 func init() {
@@ -91,6 +97,15 @@ func main() {
 			}
 		}
 
-		lnkdng.CreateBookmark(ctx, req)
+		_, error := lnkdng.CreateBookmark(ctx, req)
+		if error != nil {
+			log.Error(error)
+			message := fmt.Sprintf("%s\nError: %s", ErrInvalidURL, error)
+			tg.SendMessage(ctx, update.Message.Chat.ID, message)
+		} else {
+			log.Info("Link added successfully")
+			tg.SendMessage(ctx, update.Message.Chat.ID, MsgLinkAdded)
+		}
+
 	}
 }

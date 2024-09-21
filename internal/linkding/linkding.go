@@ -95,7 +95,7 @@ func (l *Linkding) CreateBookmark(ctx context.Context, opts *CreateBookmarkReqBo
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 201 {
-		l.log.Errorf("status code of POST %s - %d", l.addr+bookmarksMethods, resp.StatusCode)
+		return nil, fmt.Errorf("status code of POST %s - %d", l.addr+bookmarksMethods, resp.StatusCode)
 	}
 
 	body, err := io.ReadAll(resp.Body)
