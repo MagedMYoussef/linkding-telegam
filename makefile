@@ -1,6 +1,6 @@
-IMAGE_NAME=linkding-telegram
+IMAGE_NAME=magedm/memex
 
-VERSION=latest
+VERSION=1.0.1-linkding-telegram-bot
 
 DOCKERFILE_PATH=.
 
@@ -8,7 +8,7 @@ lint:
 	golangci-lint run
 	
 build: clean
-	docker build -t $(IMAGE_NAME):$(VERSION) $(DOCKERFILE_PATH)
+	docker buildx build --platform linux/amd64 -t $(IMAGE_NAME):$(VERSION) $(DOCKERFILE_PATH)
 
 clean: stop
 	docker rmi $(IMAGE_NAME):$(VERSION) || true
